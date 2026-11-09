@@ -5,7 +5,7 @@ ap.add_argument("audio"); ap.add_argument("--model", default=os.environ.get("AI_
 ap.add_argument("--lang", default=None); ap.add_argument("--out", default=None)
 a = ap.parse_args()
 base = a.out or os.path.splitext(a.audio)[0]
-m = WhisperModel(a.model, device="cpu", compute_type="int8", download_root=os.path.expanduser("~/ai-tools/models/whisper"))
+m = WhisperModel(a.model, device="cpu", compute_type=os.environ.get("AI_WHISPER_COMPUTE", "float32"), download_root=os.path.expanduser("~/ai-tools/models/whisper"))
 segs, info = m.transcribe(a.audio, language=a.lang, word_timestamps=True, vad_filter=True)
 def ts(t):
     h, r = divmod(t, 3600); mi, s = divmod(r, 60); return f"{int(h):02}:{int(mi):02}:{int(s):02},{int((s%1)*1000):03}"

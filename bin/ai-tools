@@ -2,7 +2,7 @@
 # ai-tools: list the Free AI Toolkit commands (full docs: ~/ai-tools/README.md)
 cat <<'T'
 Free AI Toolkit (~/ai-tools, docs: ~/ai-tools/README.md, GPU notebooks: ~/ai-tools/notebooks)
-  ai-vocals SONG [OUTDIR]           lead vocal + backing vocals + instrumental
+  ai-vocals SONG [OUTDIR] [--best]  lead vocal + backing vocals + instrumental
   ai-stems  SONG [OUTDIR] [--six]   drums / bass / vocals / other (+guitar, piano)
   ai-midi   AUDIO [OUTDIR]          audio -> MIDI (melody, chords, bassline)
   ai-lyrics AUDIO [--model small]   timed transcript -> .srt .txt .words.json

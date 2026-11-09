@@ -8,7 +8,7 @@ Repo (scripts, installer, GPU notebooks): https://github.com/platinum00001/free-
 
 | Command | What it does | Example |
 |---|---|---|
-| `ai-vocals SONG [OUTDIR]` | Two-pass split: vocals vs instrumental (BS-Roformer), then lead vocal vs backing vocals (UVR MDX karaoke). Outputs `NAME_lead_vocal.wav`, `NAME_backing_vocals.wav`, `NAME_instrumental.wav` | `ai-vocals song.mp3 out/` |
+| `ai-vocals SONG [OUTDIR] [--best]` | Two-pass split: vocals vs instrumental (fast UVR-MDX Voc FT; `--best` uses BS-Roformer, much slower on CPU), then lead vocal vs backing vocals (UVR MDX karaoke). Outputs `NAME_lead_vocal.wav`, `NAME_backing_vocals.wav`, `NAME_instrumental.wav` | `ai-vocals song.mp3 out/` |
 | `ai-stems SONG [OUTDIR] [--six]` | Demucs stems: drums, bass, vocals, other (`--six` adds guitar, piano) | `ai-stems song.mp3 stems --six` |
 | `ai-midi AUDIO [OUTDIR]` | Spotify basic-pitch: audio to `.mid` (melody, chords, bassline) for re-producing a beat | `ai-midi instrumental.wav midi/` |
 | `ai-lyrics AUDIO [--model small] [--lang en] [--out BASE]` | faster-whisper with word timestamps: `BASE.srt`, `BASE.txt`, `BASE.words.json` (works on video too) | `ai-lyrics lead_vocal.wav --model medium` |

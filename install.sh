@@ -8,7 +8,7 @@ export PATH="$HOME/.local/bin:$PATH" UV_LINK_MODE=copy
 CPU_TORCH="--index-url https://download.pytorch.org/whl/cpu"
 cd "$ROOT"
 [ -d venvs/rap ]    || { uv venv -q --python 3.11 venvs/rap && uv pip install -q --python venvs/rap/bin/python torch torchaudio $CPU_TORCH && uv pip install -q --python venvs/rap/bin/python "audio-separator[cpu]" faster-whisper demucs; }
-[ -d venvs/midi ]   || { uv venv -q --python 3.11 venvs/midi && uv pip install -q --python venvs/midi/bin/python "basic-pitch[onnx]" "numpy<2" "ml_dtypes==0.2.0"; }
+[ -d venvs/midi ]   || { uv venv -q --python 3.11 venvs/midi && uv pip install -q --python venvs/midi/bin/python "basic-pitch[onnx]" "numpy<2" "ml_dtypes==0.2.0" "setuptools<81"; }
 [ -d venvs/kokoro ] || { uv venv -q --python 3.11 venvs/kokoro && uv pip install -q --python venvs/kokoro/bin/python torch $CPU_TORCH && uv pip install -q --python venvs/kokoro/bin/python kokoro soundfile; }
 [ -d venvs/scrape ] || { uv venv -q --python 3.11 venvs/scrape && uv pip install -q --python venvs/scrape/bin/python "scrapling[fetchers]"; }
 [ -x ollama/bin/ollama ] || { mkdir -p ollama && curl -L https://ollama.com/download/ollama-linux-amd64.tar.zst | tar --zstd -x -C ollama; }

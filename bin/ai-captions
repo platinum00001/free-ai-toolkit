@@ -6,6 +6,6 @@ IN="$1"; shift; OUT="${IN%.*}_captioned.mp4"; [[ $# -ge 1 && "$1" != --* ]] && {
 SRT=""; MODEL=small
 while [ $# -gt 0 ]; do case "$1" in --srt) SRT="$2"; shift;; --model) MODEL="$2"; shift;; esac; shift; done
 if [ -z "$SRT" ]; then BASE="${IN%.*}"; ai-lyrics "$IN" --model "$MODEL" --out "$BASE" >/dev/null; SRT="$BASE.srt"; fi
-TMP=$(mktemp --suffix=.srt); cp "$SRT" "$TMP"
+TMP="$(dirname "$(realpath -m "$OUT")")/.aicap_$$.srt"; cp "$SRT" "$TMP"
 nice -n 10 ffmpeg -v error -y -i "$IN" -vf "subtitles=$TMP:force_style='FontName=DejaVu Sans,Bold=1,FontSize=16,PrimaryColour=&H00FFFFFF,OutlineColour=&H00000000,BorderStyle=1,Outline=2,Shadow=0,Alignment=2,MarginV=60'" -c:v libx264 -preset veryfast -crf 21 -c:a copy "$OUT"
 rm -f "$TMP"; echo "$OUT (captions: $SRT)"
