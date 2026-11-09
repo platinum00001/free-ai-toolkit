@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# ai-tts "TEXT"|@file.txt [OUT.wav] [--voice af_heart|am_michael|bf_emma|bm_george...] [--speed 1.0]
+[ $# -ge 1 ] || { echo 'usage: ai-tts "text"|@file.txt [out.wav] [--voice am_michael] [--speed 1.0]   voices: https://huggingface.co/hexgrad/Kokoro-82M/blob/main/VOICES.md'; exit 1; }
+exec nice -n 10 ~/ai-tools/venvs/kokoro/bin/python ~/ai-tools/bin/ai-tts.py "$@" 2> >(grep -viE "warn|defaulting|spacy|download" >&2)

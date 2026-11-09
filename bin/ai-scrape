@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# ai-scrape URL [CSS_SELECTOR] [--stealth] [--json]
+[ $# -ge 1 ] || { echo "usage: ai-scrape URL [CSS] [--stealth] [--json]"; exit 1; }
+exec nice -n 10 ~/ai-tools/venvs/scrape/bin/python ~/ai-tools/bin/ai-scrape.py "$@" 2> >(grep -v "INFO:" >&2)

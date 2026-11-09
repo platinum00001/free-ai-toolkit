@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# ai-lyrics AUDIO [--model small|medium|large-v3] [--lang en] [--out BASE] -> BASE.srt, BASE.txt, BASE.words.json
+[ $# -ge 1 ] || { echo "usage: ai-lyrics AUDIO_OR_VIDEO [--model small] [--lang en] [--out BASE]"; exit 1; }
+exec nice -n 10 ~/ai-tools/venvs/rap/bin/python ~/ai-tools/bin/ai-lyrics.py "$@"

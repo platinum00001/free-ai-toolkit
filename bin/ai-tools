@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# ai-tools: list the Free AI Toolkit commands (full docs: ~/ai-tools/README.md)
+cat <<'T'
+Free AI Toolkit (~/ai-tools, docs: ~/ai-tools/README.md, GPU notebooks: ~/ai-tools/notebooks)
+  ai-vocals SONG [OUTDIR]           lead vocal + backing vocals + instrumental
+  ai-stems  SONG [OUTDIR] [--six]   drums / bass / vocals / other (+guitar, piano)
+  ai-midi   AUDIO [OUTDIR]          audio -> MIDI (melody, chords, bassline)
+  ai-lyrics AUDIO [--model small]   timed transcript -> .srt .txt .words.json
+  ai-tts "TEXT"|@file [OUT.wav] [--voice am_michael]   natural voice (Kokoro)
+  ai-captions VIDEO [OUT]           auto-transcribe + burn in captions
+  ai-vertical VIDEO [OUT] [--crop] [--start T --dur S]  9:16 1080x1920 clip
+  ai-scrape URL [CSS] [--stealth] [--json]  scrape links/text from a page
+  ai-llm start|stop|status|list|ask MODEL "prompt"|add NAME REPO FILE.gguf   local LLMs (Ollama, on demand)
+  ai-3d "scene" [OUT.html]          Three.js scene written by local 3D Coder model
+All jobs run under nice (shared box). Ollama never stays on: 'ai-llm ask' starts and stops it.
+T

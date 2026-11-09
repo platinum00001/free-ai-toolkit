@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# ai-vertical IN.mp4 [OUT.mp4] [--crop] -> 1080x1920 9:16 clip (default: blurred background pad; --crop = center crop)
+set -euo pipefail
+[ $# -ge 1 ] || { echo "usage: ai-vertical IN.mp4 [OUT.mp4] [--crop] [--start 00:00:05 --dur 30]"; exit 1; }
+IN="$1"; shift; OUT="${IN%.*}_vertical.mp4"; [[ $# -ge 1 && "$1" != --* ]] && { OUT="$1"; shift; }
+MODE=pad; SS=(); T=()
+while [ $# -gt 0 ]; do case "$1" in --crop) MODE=crop;; --start) SS=(-ss "$2"); shift;; --dur) T=(-t "$2"); shift;; esac; shift; done
+if [ $MODE = crop ]; then VF="scale=-2:1920,crop=1080:1920"; else
+VF="split[a][b];[a]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,boxblur=20:2[bg];[b]scale=1080:-2[fg];[bg][fg]overlay=(W-w)/2:(H-h)/2"; fi
+nice -n 10 ffmpeg -v error -y "${SS[@]}" -i "$IN" "${T[@]}" -filter_complex "$VF" -c:v libx264 -preset veryfast -crf 21 -c:a aac -b:a 160k -movflags +faststart "$OUT"
+echo "$OUT"

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# ai-stems SONG [OUTDIR] [--six] -> drums, bass, vocals, other (+guitar, piano with --six) via Demucs
+set -euo pipefail
+[ $# -ge 1 ] || { echo "usage: ai-stems SONG [OUTDIR] [--six]"; exit 1; }
+IN="$1"; OUT="${2:-./stems}"; M=htdemucs; [[ " $* " == *" --six "* ]] && M=htdemucs_6s
+[ "${OUT}" = "--six" ] && OUT=./stems
+D=~/ai-tools/venvs/rap/bin/demucs; [ -x "$D" ] || D=/home/box/.local/bin/demucs
+nice -n 10 "$D" -n "$M" -o "$OUT" "$IN" && find "$OUT" -name '*.wav' | sort

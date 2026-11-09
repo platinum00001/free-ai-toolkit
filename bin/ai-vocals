@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# ai-vocals SONG [OUTDIR] -> lead vocal, backing vocals, instrumental (CPU)
+# env: AI_VOCALS_STEP1 (vocals vs music model), AI_VOCALS_STEP2 (karaoke lead/backing model)
+set -euo pipefail
+[ $# -ge 1 ] || { echo "usage: ai-vocals SONG.(mp3|wav) [OUTDIR]"; exit 1; }
+IN="$(realpath "$1")"; NAME="$(basename "${IN%.*}")"; OUT="$(realpath -m "${2:-./${NAME}_vocals}")"; mkdir -p "$OUT"
+S1="${AI_VOCALS_STEP1:-model_bs_roformer_ep_317_sdr_12.9755.ckpt}"
+S2="${AI_VOCALS_STEP2:-UVR_MDXNET_KARA_2.onnx}"
+SEP=~/ai-tools/venvs/rap/bin/audio-separator; MD=~/ai-tools/models/audio-separator
+echo "[1/2] vocals vs instrumental ($S1)"
+nice -n 10 "$SEP" "$IN" -m "$S1" --model_file_dir "$MD" --output_dir "$OUT" --output_format WAV \
+  --custom_output_names "{\"Vocals\":\"${NAME}_vocals\",\"Instrumental\":\"${NAME}_instrumental\"}" --log_level warning
+echo "[2/2] lead vs backing vocals ($S2)"
+nice -n 10 "$SEP" "$OUT/${NAME}_vocals.wav" -m "$S2" --model_file_dir "$MD" --output_dir "$OUT" --output_format WAV \
+  --custom_output_names "{\"Vocals\":\"${NAME}_lead_vocal\",\"Instrumental\":\"${NAME}_backing_vocals\"}" --log_level warning
+ls -1 "$OUT"

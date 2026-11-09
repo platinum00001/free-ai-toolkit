@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# ai-3d "scene description" [OUT.html]  -> single-file Three.js scene written by Qwen3.5-4B-3D-Coder (local, CPU; slow when box is busy)
+set -euo pipefail
+[ $# -ge 1 ] || { echo 'usage: ai-3d "snowy ice wall with a glowing gate" [out.html]'; exit 1; }
+OUT="${2:-scene.html}"; TMP=$(mktemp)
+ai-llm ask 3dcoder "Write one complete self-contained HTML file that uses Three.js from a CDN (importmap, https://unpkg.com/three@0.170.0). Include OrbitControls, lighting and animation. Scene: $1. Output only the HTML." > "$TMP"
+python3 - "$TMP" "$OUT" <<'PY'
+import re,sys; s=open(sys.argv[1]).read(); m=re.search(r'<!DOCTYPE html.*?</html>|<html.*?</html>',s,re.S|re.I)
+open(sys.argv[2],'w').write(m.group(0) if m else s); print(sys.argv[2], "(complete html)" if m else "(raw output, check it)")
+PY
+rm -f "$TMP"

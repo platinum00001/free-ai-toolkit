@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# ai-midi AUDIO [OUTDIR] -> .mid transcription of the melody/beat (Spotify basic-pitch, ONNX on CPU)
+set -euo pipefail
+[ $# -ge 1 ] || { echo "usage: ai-midi AUDIO [OUTDIR]"; exit 1; }
+OUT="${2:-./midi}"; mkdir -p "$OUT"
+TF_CPP_MIN_LOG_LEVEL=3 nice -n 10 ~/ai-tools/venvs/midi/bin/basic-pitch "$OUT" "$1" 2>&1 | grep -viE "warning|coreml|tflite|onednn|tensorflow" || true
+ls -1 "$OUT"/*.mid

@@ -1,0 +1,8 @@
+venvs/
+models/
+logs/
+smoke/
+ollama/
+*.wav
+*.mp4
+__pycache__/

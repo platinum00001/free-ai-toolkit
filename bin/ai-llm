@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# ai-llm: local LLMs via Ollama, started on demand (never left running).
+#   ai-llm start | stop | status | list
+#   ai-llm ask MODEL "prompt"      (auto-starts, answers, stops again if it started it)
+#   ai-llm chat MODEL              (interactive; stop with: ai-llm stop)
+#   ai-llm add NAME HF_REPO FILE.gguf   (download a GGUF from Hugging Face with curl and register it)
+export OLLAMA_MODELS=~/ai-tools/models/ollama OLLAMA_HOST=127.0.0.1:11434 OLLAMA_KEEP_ALIVE=2m
+export OLLAMA_NUM_PARALLEL=1 OLLAMA_MAX_LOADED_MODELS=1
+OL=~/ai-tools/ollama/bin/ollama; LOG=~/ai-tools/logs/ollama.log; THREADS=${AI_LLM_THREADS:-4}
+up(){ curl -s -m 2 http://127.0.0.1:11434/api/version >/dev/null; }
+start(){ up && return 0; nohup nice -n 15 "$OL" serve >>"$LOG" 2>&1 & for i in $(seq 1 30); do up && return 0; sleep 1; done; echo "ollama failed to start, see $LOG"; return 1; }
+stop(){ pkill -f "$OL serve"; pkill -f "ai-tools/ollama/lib/ollama/llama-server"; true; }
+case "${1:-}" in
+  start) start && echo "ollama up on 127.0.0.1:11434 (run 'ai-llm stop' when done)";;
+  stop) stop; echo stopped;;
+  status) up && { echo running; "$OL" ps; } || echo stopped;;
+  list) started=0; up || { start; started=1; }; "$OL" list; [ $started = 1 ] && stop;;
+  ask) [ $# -ge 3 ] || { echo 'usage: ai-llm ask MODEL "prompt"'; exit 1; }
+       started=0; up || { start || exit 1; started=1; }
+       M="$2"; shift 2; P="$*"; [[ "$P" == @* ]] && P="$(cat "${P:1}")"
+       python3 - "$M" "$P" "$THREADS" <<'PY'
+import json,sys,urllib.request
+m,p,t=sys.argv[1],sys.argv[2],int(sys.argv[3])
+req=urllib.request.Request("http://127.0.0.1:11434/api/generate",data=json.dumps({"model":m,"prompt":p,"stream":True,"think":False,"options":{"num_thread":t}}).encode())
+for line in urllib.request.urlopen(req,timeout=3600):
+    d=json.loads(line); print(d.get("response",""),end="",flush=True)
+    if d.get("error"): print("ERROR:",d["error"],file=sys.stderr)
+print()
+PY
+       [ $started = 1 ] && stop;;
+  chat) start && "$OL" run "$2";;
+  add) [ $# -ge 4 ] || { echo "usage: ai-llm add NAME HF_REPO FILE.gguf"; exit 1; }
+       D=~/ai-tools/models/gguf; mkdir -p "$D"; curl -L --fail -o "$D/$4" "https://huggingface.co/$3/resolve/main/$4" || exit 1
+       printf 'FROM %s\n' "$D/$4" > "$D/$2.Modelfile"; started=0; up || { start; started=1; }
+       "$OL" create "$2" -f "$D/$2.Modelfile" && rm -f "$D/$4"; [ $started = 1 ] && stop;;
+  pull) started=0; up || { start; started=1; }; "$OL" pull "$2"; [ $started = 1 ] && stop;;
+  *) sed -n '2,8p' "$0";;
+esac
